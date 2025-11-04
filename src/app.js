@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./modules/auth/routes/auth.routes.js";
+import { errorHandler } from "./middleware/error.middleware.js"; 
 
 dotenv.config();
 
@@ -22,5 +23,6 @@ app.use("/api/v1/auth", authRoutes);
 
 
 
+app.use(errorHandler);
 
 export default app;

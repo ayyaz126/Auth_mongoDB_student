@@ -8,9 +8,8 @@ export const authMiddleware = (req, res, next) => {
     if (!token) {
       return res.status(401).json({ message: "Access token missing" });
     }
-
     const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
-    req.user = decoded; // attach decoded user info
+    req.user = decoded; 
     next();
   } catch (error) {
     return res.status(403).json({ message: "Invalid or expired token" });

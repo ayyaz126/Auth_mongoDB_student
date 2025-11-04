@@ -1,1 +1,57 @@
 ayyaz123123 
+
+JWT-based authentication me hum do token use karte hain:
+
+Access Token → short time ke liye valid (e.g., 15 minutes)
+
+Refresh Token → long time ke liye valid (e.g., 7 days)
+
+
+ Problem: Access Token jaldi expire ho jata hai
+
+Jab user login karta hai to tum usay ek access token dete ho.
+Ye token har request ke saath server ko dikhata hai taake server verify kare ke user authenticated hai.
+
+Lekin — ye token short-lived hota hai (sirf 15 minute jaise).
+Iska reason security hai:
+
+agar koi token leak ho jaye to hacker zyada der tak use na kar sake.
+
+Ab jab 15 minute baad access token expire ho jata hai,
+user ko dobara login karwana accha nahi lagta 
+
+ Solution: Refresh Token
+
+Isi liye hum ek refresh token bhi dete hain (usually 7 days ya 30 days ke liye).
+Refresh token ko hum HTTP-only cookie me store karte hain (browser ke andar, jahan JS access nahi kar sakta — secure 🔒).
+
+Ab jab access token expire ho jata hai,
+frontend app (React / React Native) quietly ek request bhejti hai /api/v1/auth/refresh pe.
+
+
+Refresh Controller ka kaam
+
+Refresh controller ye request handle karta hai.
+Uska step-by-step kaam ye hota hai 
+
+Cookie se refresh token read karo
+(jo login ke time humne set kiya tha)
+
+Verify karo ke token valid hai
+(JWT ke through decode karke)
+
+Naya access token generate karo
+(taake user ko dobara login na karna pade)
+
+Naya access token frontend ko return karo
+(refresh token abhi bhi valid rahta hai)
+
+
+
+🧩 Example Flow
+Step	          Action	                          Token Used	                            Result
+1️⃣	             UserLogin	                              	—                          Access + Refresh token generate
+2️⃣	          AccessAPI(within 15 min)	               Access Token	                         ✅ Success
+3️⃣	             After 15 min	                     Access Token expired	                 ❌ Error
+4️⃣	              Call /refresh	                     Refresh Token	                        🔄 New Access Token
+5️⃣	           Continue using app	                  New Access Token	                    ✅ Works again
